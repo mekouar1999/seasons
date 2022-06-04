@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEASONS</title>
+
+    <link rel="stylesheet" href="css/seasons.css">
+
+    <script src="/socket.io/socket.io.js"></script>
+
+    <script src="js/page.js"></script>
+    <script src="js/resources.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/actions.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/dices-info.js"></script>
+    <script src="js/cards-info.js"></script>
+    <script src="js/pawn.js"></script>
+</head>
+<body class="global">
+    <div class="page" id="page">
+        <div class="menu">
+            <img src="images/seasons-logo.png" alt="" style="width: 120px;vertical-align: middle;">
+            <span onclick="home()">Accueil</span>
+            <span onclick="login()">Jouer</span>
+            <span onclick="showStatus()">Status</span>
+        </div>
+        <div id="toolbar" class="toolbar">
+            <span id="t-player"></span>
+            <span id="t-turn"></span>
+            <span class="button" id="t-roll-dice" style="display: none;" onclick="actions.requestDices()">Lancer Partie </span>
+            <span class="button" id="t-play-dice-1" style="display: none;">Jouer les dés</span>
+            <span class="button" id="t-terminate-stage" style="display: none;" onclick="actions.terminateStage()">Terminer</span>
+            <span class="image" id="t-play-dice" style="display: none;">
+                <img src="icons/waiting.gif" style="width: 100%;" />
+            </span>
+            <span class="game-message" id="t-game-message" style="display: none; border-left: none;"></span>
+        </div>
+        <div class="page-title" id="page-title" style="display: none;">Bienvenue sur SEASONS</div>
+
+        <div id="cards" style="display: none;">
+
+            <div class="cards">
+                <div class="cards-per-year">
+                    <div>1ère année</div><div>2ème année</div><div>3ème année</div>
+                </div>
+                <div class="selected-cards">
+                    <div id="s11"></div><div id="s12"></div><div id="s13"></div>
+                    <div id="s21"></div><div id="s22"></div><div id="s23"></div>
+                    <div id="s31"></div><div id="s32"></div><div id="s33"></div>
+                </div>
+            </div>
+
+            <div class="cards" style="border: none;" id="source-cards">
+                <div class="source-cards">
+                    <div id="s0"></div><div id="s1"></div><div id="s2"></div>
+                    <div id="s3"></div><div id="s4"></div><div id="s5"></div>
+                    <div id="s6"></div><div id="s7"></div><div id="s8"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="game" style="display: none;">
+            <table class="plateau">
+                <tr>
+                    <td rowspan="2" style="width: 400px;">
+                        <img src="images/seasons.png" style="width: 400px;" id="img-seasons" />
+                        <img src="icons/pawn-m.png" class="pawn-seasons" id="pawn-seasons" />
+                        <img src="icons/pawn-y.png" class="pawn-seasons-year" id="pawn-seasons-year" />
+                    </td>
+                    <td>
+                        <div id="dices" class="dices">
+
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <div id="hand-cards" class="hand-cards">
+
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                      <table><tr><td>
+                        <table class="dashboard">
+                            <tbody>
+                            <tr><td id="player">Othman</td><td id="can-crystallize"></td></tr>
+                            <tr><td id="selected-dice" class="selected-dice"></td><td>
+                                <table class="result-box">
+                                    <tr>
+                                        <td title="Energie feu gagnée" id="fire-ref"></td>
+                                        <td title="Energie eau gagnée" id="water-ref"></td>
+                                        <td title="Energie terre gagnée" id="land-ref"></td>
+                                        <td title="Energie air gagnée" id="air-ref"></td>
+                                        <td title="Nombres de cristaux gagnés" id="crystals-ref"></td>
+                                        <td title="Points invocation" id="invocation-ref"></td>
+                                    </tr>
+                                    <tr id="result-row">
+                                        <td id="fire">0</td>
+                                        <td id="water">0</td>
+                                        <td id="land">0</td>
+                                        <td id="air">0</td>
+                                        <td id="crystals">0</td>
+                                        <td id="invocation">0</td>
+                                    </tr>
+                                </table>
+                            </td></tr>
+                            </tbody>
+                        </table>
+                      </td><td style="border: none;">
+                        <div id="invoked-cards" class="invoked-cards">
+
+                        </div>
+                      </td></tr></table>
+                    </td>
+                </tr>
+            </table>
+
+
+        </div>
+
+        <div class="tip-box" id="tip-box" style="display: none;">
+
+        </div>
+
+        <div class="card-tip-box" id="card-tip-box" style="display: none;">
+
+        </div>
+        
+        <div class="form-login" style="display: none;" id="form-login">
+            <img src="images/seasons-login.jpg" alt=""/>
+            <div>
+                <label for="username">Nom d'utilisateur</label>
+                <div>
+                    <input type="text" id="username" minlength="2" placeholder="Saisir votre nom d'utilisateur" required />
+                </div>
+                <button class="btn" id="start" onclick="actions.sendData()">Jouer à SEASONS</button>
+            </div>
+        </div>
+        <table class="data-table" id="data-table">
+            <tr><td>Info : </td><td id="info"></td></tr>
+            <tr><td>Id Room : </td><td id="room"></td></tr>
+            <tr><td>Lien à Partager : </td><td id="link-to-share"></td></tr>
+            <tr><td>Id Joueur : </td><td id="player-id"></td></tr>
+            <tr><td>Nom Joueur : </td><td id="player-name"></td></tr>
+            <tr><td>Host : </td><td id="host"></td></tr>
+            <tr><td>Tour : </td><td id="turn"></td></tr>
+            <tr><td>Etat : </td><td id="status">?</td></tr>
+            <tr><td>Joueurs : </td><td id="players-list">?</td></tr>
+        </table>
+        <div id="about">
+            <div class="about">Cette application web offrant le jeux SEASONS est réalisée par MEKOUAR OTHMAN , DALAL YASSINE ET HACHIMI YOUSSEF et sera bientot disponible !</div>
+            <div class="label">JEUX MULTIJOUEURS ( 2 à 4 personnes )</div>
+        </div>
+
+        <div class="seasons-end" id="seasons-end">
+            <div>
+                <img src="images/seasons-end.jpg" />
+                <div id="winner">
+                  
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/client.js"></script>
+</body>
+</html>
